@@ -1,4 +1,5 @@
 #include "tree.h"
+#include "Dump/dump.h"
 
 FILE* LogList = StartLog();
 

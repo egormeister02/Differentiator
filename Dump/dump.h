@@ -1,3 +1,5 @@
+#ifndef DUMP
+#define DUMP
 #include "colors.h"
 
 #define StatPrint_(STATUS,text)                 \
@@ -19,3 +21,5 @@ size_t print_tree_links(Tree* tree, Node* node_ptr, FILE* DumpFile);
 FILE* StartLog(void);
 
 void MakePngName(char* name, char num);
+
+#endif

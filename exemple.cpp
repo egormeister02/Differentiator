@@ -1,4 +1,5 @@
 #include "tree.h"
+#include "Dump/dump.h"
 
 int main()
 {
@@ -12,7 +13,7 @@ int main()
     val.value = 10;
     tree.root->right_child = CreateNode(&tree, IS_VAL, val);
 
-    //TreeDump(&tree);
+    TreeDump(&tree);
     //TreeDump(&tree);
     //TreeDump(&tree);
 

@@ -1,3 +1,5 @@
+#ifndef TREE
+#define TREE
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -47,11 +49,10 @@ struct Tree
     size_t       status       = TREE_OK;
 };
 
-#include "dump.h"
-
-
 Node* CreateNode(Tree*, node_type, node_data);
 
 void  tree_dtor(Tree* tree_ptr);
 
 void  dtor_childs(Node* node_ptr);
+
+#endif
