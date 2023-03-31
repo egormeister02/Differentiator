@@ -24,6 +24,118 @@ Node* CreateNode(Tree* tree, node_type type, node_data data)
 
     return new_node;
 }
+/*
+void print_leaves(Node* node_ptr)
+{
+    if(node_ptr->left_child == nullptr && node_ptr->right_child == nullptr && node_ptr->type == IS_VAL)
+    {
+        fprintf(OutFile, "%f ", node_ptr->data.value);
+        return;
+    }
+    if(node_ptr->left_child != nullptr)
+    {
+        print_leaves(node_ptr->left_child);
+    }
+    if(node_ptr->right_child != nullptr)
+    {
+        print_leaves(node_ptr->right_child);
+    }
+}
+*/
+void PrintTree(FILE* OutFile, Tree* tree, PrintMode mode)
+{
+    char* func_str[NUMBER_FUNC] = {};
+
+    #define DEF_FUNC(name, code, str) char name[5] = str; func_str[code] = name;
+    #include "def_cmd.h"
+    #undef DEF_FUNC
+
+    switch (mode)
+    {
+    case IN:
+        print_inorder(OutFile, tree->root, func_str);
+        break;
+
+    case PRE:
+        print_preorder(OutFile, tree->root, func_str);
+        break;
+    
+    default:
+        print_postorder(OutFile, tree->root, func_str);
+        break;
+    }
+}
+
+void print_preorder(FILE* OutFile, Node* node_ptr, char** func_str)
+{
+    if(node_ptr == nullptr)
+    {
+        return;
+    }
+    fprintf(OutFile, "(");
+    if (node_ptr->type == IS_VAL)
+    {
+        fprintf(OutFile, "%.3f", node_ptr->data.value);
+    }
+    else if (node_ptr->type == IS_FUNC)
+    {
+        fprintf(OutFile, "%s", func_str[node_ptr->data.number]);
+    }
+    else 
+        fprintf(OutFile, "%c", (char)node_ptr->data.number);
+
+    print_preorder(OutFile, node_ptr->left_child, func_str);
+    print_preorder(OutFile, node_ptr->right_child, func_str);
+    fprintf(OutFile, ")");
+}
+
+void print_inorder(FILE* OutFile, Node* node_ptr, char** func_str)
+{
+    if(node_ptr == nullptr)
+    {
+        return;
+    }
+    fprintf(OutFile, "(");
+    print_inorder(OutFile, node_ptr->left_child, func_str);
+    if (node_ptr->type == IS_VAL)
+    {
+        fprintf(OutFile, "%.3f", node_ptr->data.value);
+    }
+    else if (node_ptr->type == IS_FUNC)
+    {
+        fprintf(OutFile, "%s", func_str[node_ptr->data.number]);
+    }
+    else
+    {
+        fprintf(OutFile, "%c", (char)node_ptr->data.number);
+    }
+    print_inorder(OutFile, node_ptr->right_child, func_str);
+    fprintf(OutFile, ")");
+}
+
+void print_postorder(FILE* OutFile, Node* node_ptr, char** func_str)
+{
+    if(node_ptr == nullptr)
+    {
+        return;
+    }
+    fprintf(OutFile, "(");
+    print_postorder(OutFile, node_ptr->left_child, func_str);
+    print_postorder(OutFile, node_ptr->right_child, func_str);
+    if (node_ptr->type == IS_VAL)
+    {
+        fprintf(OutFile, "%.3f", node_ptr->data.value);
+    }
+    else if (node_ptr->type == IS_FUNC)
+    {
+        fprintf(OutFile, "%s", func_str[node_ptr->data.number]);
+    }
+    else
+    {
+        fprintf(OutFile, "%c", (char)node_ptr->data.number);
+    }
+    fprintf(OutFile, ")");
+}
 
 void  tree_dtor(Tree* tree_ptr)
 {

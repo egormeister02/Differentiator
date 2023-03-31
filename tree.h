@@ -6,6 +6,19 @@
 
 const size_t TREE_POISON = 0xffdeedff;
 
+#define DEF_FUNC(...) +1
+const size_t NUMBER_FUNC = 1 
+#include "def_cmd.h"
+#undef DEF_FUNC 
+-1;
+
+enum PrintMode
+{
+    IN   = 0,
+    PRE  = 1,
+    POST = 2
+};
+
 union node_data
 {    
     double            value;
@@ -14,7 +27,7 @@ union node_data
 
 enum functions
 {
-    #define DEF_FUNC(name, code) name = code,
+    #define DEF_FUNC(name, code, ...) name = code,
     #include "def_cmd.h"
     #undef DEF_FUNC
 };
@@ -49,7 +62,17 @@ struct Tree
     size_t       status       = TREE_OK;
 };
 
+
+
 Node* CreateNode(Tree*, node_type, node_data);
+
+void PrintTree(FILE*, Tree*, PrintMode);
+
+void print_preorder(FILE*, Node*, char**);
+
+void print_inorder(FILE*, Node*, char**);
+
+void print_postorder(FILE*, Node*, char**);
 
 void  tree_dtor(Tree* tree_ptr);
 

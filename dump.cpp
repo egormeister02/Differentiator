@@ -1,5 +1,5 @@
 #include "tree.h"
-#include "Dump/dump.h"
+#include "dump.h"
 
 FILE* LogList = StartLog();
 
@@ -77,7 +77,7 @@ size_t print_tree_data(Tree* tree, Node* node_ptr, FILE* DumpFile)
         }
         else if(node_ptr->type == IS_FUNC)
         {
-            #define DEF_FUNC(name, code)                                                                                \
+            #define DEF_FUNC(name, code, ...)                                                                                \
             if (node_ptr->data.number == code)                                                                          \
             {                                                                                                           \
                 fprintf(DumpFile, "\tnode_%p[shape = Mrecord, style=\"filled\" fillcolor=\"%s\", label =\" { <f0> left_child = %p } | {{<here> type = FUNCTION} | {value = %s \\n}} | { <f1> right_child = %p } \"];\n",                           \
