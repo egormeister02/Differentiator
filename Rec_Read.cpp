@@ -103,9 +103,10 @@ Node* GetS(const char** s)
         #define DEF_FUNC(name, code, str)                   \
         if (code > 4 && name != Log)                        \
         {                                                   \
+            memset(in_str, 0, 5);                           \
             strncpy(in_str, *s, strlen(str));               \
             if (strcasecmp(in_str, str) == 0)               \
-                {                                           \
+                {                              \
                     node = (Node*)calloc(1, sizeof(Node));  \
                     node->type = IS_FUNC;                   \
                     node->data.number = code;               \
@@ -114,15 +115,16 @@ Node* GetS(const char** s)
         }                                                   \
         else if (name == Log)                               \
         {                                                   \
+            memset(in_str, 0, 5);                           \
             strncpy(in_str, *s, strlen(str));               \
             if (strcasecmp(in_str, str) == 0)               \
                 {                                           \
                     node = GetLog(s);                       \
-                    *s += 3;                                \
                 }                                           \
         }                      
         #include "def_cmd.h"
         #undef DEF_FUNC 
+
         if (node == NULL)
             node = GetV(s); 
 
@@ -146,6 +148,22 @@ Node* GetV(const char** s)
 Node* GetLog(const char** s)
 {
     Node* node = (Node*)calloc(1, sizeof(Node));
+    node->type = IS_FUNC;
+    node->data.number = Log;
+
+    *s += 3;
+
+    if (**s == '(')
+    {     
+        *s += 1;
+        node->left_child = GetE(s);
+        ASSERT(**s == ',');
+        *s += 1;
+        node->right_child = GetE(s);
+        ASSERT(**s == ')');
+        *s += 1;
+    }
+    
     return node;
 }
 
