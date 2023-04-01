@@ -1,4 +1,4 @@
-DEF_FUNC(Add, 0, "+\0\0\0") 
+DEF_FUNC(Add, 0, "+")
 DEF_FUNC(Sub, 1, "-")
 DEF_FUNC(Mul, 2, "*")
 DEF_FUNC(Div, 3, "/")

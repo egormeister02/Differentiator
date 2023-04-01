@@ -24,24 +24,7 @@ Node* CreateNode(Tree* tree, node_type type, node_data data)
 
     return new_node;
 }
-/*
-void print_leaves(Node* node_ptr)
-{
-    if(node_ptr->left_child == nullptr && node_ptr->right_child == nullptr && node_ptr->type == IS_VAL)
-    {
-        fprintf(OutFile, "%f ", node_ptr->data.value);
-        return;
-    }
-    if(node_ptr->left_child != nullptr)
-    {
-        print_leaves(node_ptr->left_child);
-    }
-    if(node_ptr->right_child != nullptr)
-    {
-        print_leaves(node_ptr->right_child);
-    }
-}
-*/
+
 void PrintTree(FILE* OutFile, Tree* tree, PrintMode mode)
 {
     char* func_str[NUMBER_FUNC] = {};

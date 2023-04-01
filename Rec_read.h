@@ -1,4 +1,3 @@
-
 #include "tree.h"
 #define ASSERT(condition)                                         \
 if (!(condition)){                                                \
@@ -23,3 +22,9 @@ Node* GetP(const char**);
 double GetN(const char**);
 
 Node* GetF(const char**);
+
+Node* GetV(const char**);
+
+Node* GetS(const char**);
+
+Node* GetLog(const char**);
