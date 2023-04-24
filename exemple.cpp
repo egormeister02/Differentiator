@@ -4,14 +4,14 @@
 
 int main()
 {
-    FILE* Out = fopen("outfile.txt", "a+");
+    FILE* In = fopen("file.in", "r");
+    FILE* Out = fopen("file.out", "w");
+    TEXT text = {};
     Tree tree = {};
 
-    char* str = NULL;
-    str = (char*)calloc(100, sizeof(char));
-    scanf("%s", str);
-    tree.root = GetG(str);
-    free(str);
+    CreateText(&text, In);
+    tree.root = GetG(text.buf, &tree);
+    DtorText(&text);
 
 /*
     val.number = Add;
@@ -23,7 +23,6 @@ int main()
 */
     TreeDump(&tree);
     PrintTree(Out, &tree, IN);
-    fputc('\n', Out);
     //TreeDump(&tree);
     //TreeDump(&tree);
 

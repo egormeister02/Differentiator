@@ -8,23 +8,31 @@ if (!(condition)){                                                \
            #condition, __FILE__, __LINE__, __PRETTY_FUNCTION__);  \
     abort();}
 
+struct TEXT {
+    char* buf = NULL;
+    size_t size = 0;
+};
 
-Node* GetG(const char*);
+int CreateText(TEXT*, FILE*);
 
-Node* GetE(const char**);
+void DtorText(TEXT*);
 
-Node* GetT(const char**);
+Node* GetG(const char*, Tree*);
 
-Node* GetB(const char**);
+Node* GetE(const char**, Tree*);
 
-Node* GetP(const char**);
+Node* GetT(const char**, Tree*);
+
+Node* GetB(const char**, Tree*);
+
+Node* GetP(const char**, Tree*);
 
 double GetN(const char**);
 
-Node* GetF(const char**);
+Node* GetF(const char**, Tree*);
 
-Node* GetV(const char**);
+Node* GetV(const char**, Tree*);
 
-Node* GetS(const char**);
+Node* GetS(const char**, Tree*);
 
-Node* GetLog(const char**);
+Node* GetLog(const char**, Tree*);

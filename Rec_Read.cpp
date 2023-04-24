@@ -1,165 +1,198 @@
 #include "Rec_read.h"
 
-Node* GetG(const char* str)
+int CreateText(TEXT* text, FILE* file) 
+{
+    ASSERT(text != NULL);
+    ASSERT(file != NULL);
+
+    fseek(file, 0, SEEK_END);
+    text->size = ftell(file);
+    rewind(file);
+
+    text->buf = (char*)calloc(text->size + 1, sizeof(char));
+    if (text->buf == NULL) return -1;
+
+    text->size = fread(text->buf,sizeof(char), text->size, file);
+}
+
+void DtorText(TEXT* text)
+{
+    ASSERT(text != NULL);
+
+    free(text->buf);
+    text->buf = NULL;
+    
+}
+
+
+Node* GetG(const char* str, Tree* tree)
 {
     const char* s = str;
-    Node* root = GetE(&s);
+    Node* root = GetE(&s, tree);
     ASSERT(*s == 0);
     return root;
 }
 
-Node* GetE(const char** s)
+Node* GetE(const char** s, Tree* tree)
 {
-    Node* node_ch_1 = GetT(s);
+    Node* node_ch_1 = GetT(s, tree);
     while (**s == '+' || **s == '-')
     {
         char op = **s;
         *s += 1;
 
-        Node* node = (Node*)calloc(1, sizeof(Node));
-        node->type = IS_FUNC;
-
-        node->left_child  = node_ch_1;
-        node->right_child =   GetT(s);
+        node_data node_oper = {};
+        Node* node = NULL;
 
         if (op == '+')
-            node->data.number = Add; 
+            node_oper.number = Add; 
         else
-            node->data.number = Sub; 
+            node_oper.number = Sub; 
+
+        node = CreateNode(tree, IS_FUNC, node_oper);
+
+        node->left_child  = node_ch_1;
+        node->right_child =   GetT(s, tree);
+        
         node_ch_1 = node;
     }
     return node_ch_1;
 }
 
-Node* GetT(const char** s)
+Node* GetT(const char** s, Tree* tree)
 {
-    Node* node_ch_1 = GetP(s);
+    Node* node_ch_1 = GetP(s, tree);
     while (**s == '*' || **s == '/')
     {
         char op = **s;
         *s += 1;
 
-        Node* node = (Node*)calloc(1, sizeof(Node));
-        node->type = IS_FUNC;
-
-        node->left_child  = node_ch_1;
-        node->right_child =   GetP(s);
+        node_data node_oper = {};
+        Node* node = NULL;
 
         if (op == '*')
-            node->data.number = Mul; 
+            node_oper.number = Mul; 
         else
-            node->data.number = Div; 
+            node_oper.number = Div; 
+
+        node = CreateNode(tree, IS_FUNC, node_oper);
+
+        node->left_child  = node_ch_1;
+        node->right_child =   GetP(s, tree);
+
         node_ch_1 = node;
     }
     return node_ch_1;
 }
 
-Node* GetP(const char** s)
+Node* GetP(const char** s, Tree* tree)
 {
-    Node* node_ch_1 = GetB(s);
+    Node* node_ch_1 = GetB(s, tree);
     while (**s == '^')
     {
         *s += 1;
 
-        Node* node = (Node*)calloc(1, sizeof(Node));
-        node->type = IS_FUNC;
+        node_data node_oper = {};
+        Node* node = NULL;
+        node_oper.number = Pow; 
+        node = CreateNode(tree, IS_FUNC, node_oper);
 
         node->left_child  = node_ch_1;
-        node->right_child =   GetB(s);
-
-        node->data.number = Pow; 
+        node->right_child =   GetB(s, tree);
 
         node_ch_1 = node;
     }
     return node_ch_1;
 }
 
-Node* GetB(const char** s)
+Node* GetB(const char** s, Tree* tree)
 {
     Node* node = NULL;
     if (**s== '(')
     {
         *s += 1;
-        node = GetE(s);
+        node = GetE(s, tree);
         ASSERT(**s== ')');
         *s += 1;
     }
     else 
-        node = GetS(s);
+        node = GetS(s, tree);
     
     return node;
 }
 
-Node* GetS(const char** s)
+Node* GetS(const char** s, Tree* tree)
 {
     Node* node = NULL;
     const char* sOld = *s;
     if ('0' <= **s && **s <= '9')
-        node = GetF(s);
+        node = GetF(s, tree);
     else 
     {
         char in_str[5] = {};
 
-        #define DEF_FUNC(name, code, str)                   \
-        if (code > 4 && name != Log)                        \
-        {                                                   \
-            memset(in_str, 0, 5);                           \
-            strncpy(in_str, *s, strlen(str));               \
-            if (strcasecmp(in_str, str) == 0)               \
-                {                              \
-                    node = (Node*)calloc(1, sizeof(Node));  \
-                    node->type = IS_FUNC;                   \
-                    node->data.number = code;               \
-                    *s += strlen(str);                      \
-                }                                           \
-        }                                                   \
-        else if (name == Log)                               \
-        {                                                   \
-            memset(in_str, 0, 5);                           \
-            strncpy(in_str, *s, strlen(str));               \
-            if (strcasecmp(in_str, str) == 0)               \
-                {                                           \
-                    node = GetLog(s);                       \
-                }                                           \
+        #define DEF_FUNC(name, code, str)                           \
+        if (code > 4 && name != Log)                                \
+        {                                                           \
+            memset(in_str, 0, 5);                                   \
+            strncpy(in_str, *s, strlen(str));                       \
+            if (strcasecmp(in_str, str) == 0)                       \
+                {                                                   \
+                    node_data node_oper =   {};                     \
+                    node_oper.number    = code;                     \
+                    node = CreateNode(tree, IS_FUNC, node_oper);    \
+                    *s += strlen(str);                              \
+                }                                                   \
+        }                                                           \
+        else if (name == Log)                                       \
+        {                                                           \
+            memset(in_str, 0, 5);                                   \
+            strncpy(in_str, *s, strlen(str));                       \
+            if (strcasecmp(in_str, str) == 0)                       \
+                {                                                   \
+                    node = GetLog(s, tree);                         \
+                }                                                   \
         }                      
         #include "def_cmd.h"
         #undef DEF_FUNC 
 
         if (node == NULL)
-            node = GetV(s); 
+            node = GetV(s, tree); 
 
         else if (**s == '(')
-            node->left_child = GetB(s); 
+            node->left_child = GetB(s, tree); 
 
     }
     ASSERT(*s > sOld);
     return node;
 }
 
-Node* GetV(const char** s)
+Node* GetV(const char** s, Tree* tree)
 {
-    Node* node = (Node*)calloc(1, sizeof(Node));
-    node->type = IS_VARIB;
-    node->data.number = (size_t)**s;
+    node_data node_code = {};
+    Node* node = NULL;
+    node_code.number = (size_t)**s;
+    node = CreateNode(tree, IS_VARIB, node_code);
     *s += 1;
     return node;
 }
 
-Node* GetLog(const char** s)
+Node* GetLog(const char** s, Tree* tree)
 {
-    Node* node = (Node*)calloc(1, sizeof(Node));
-    node->type = IS_FUNC;
-    node->data.number = Log;
+    node_data node_oper = {};
+    Node* node = NULL;
+    node_oper.number = Log;
+    node = CreateNode(tree, IS_FUNC, node_oper);
 
     *s += 3;
 
     if (**s == '(')
     {     
         *s += 1;
-        node->left_child = GetE(s);
+        node->left_child = GetE(s, tree);
         ASSERT(**s == ',');
         *s += 1;
-        node->right_child = GetE(s);
+        node->right_child = GetE(s, tree);
         ASSERT(**s == ')');
         *s += 1;
     }
@@ -167,21 +200,21 @@ Node* GetLog(const char** s)
     return node;
 }
 
-Node* GetF(const char** s)
+Node* GetF(const char** s, Tree* tree)
 {
-    Node* node = (Node*)calloc(1, sizeof(Node));
-    node->type = IS_VAL;
+    node_data node_val = {};
+    Node* node = NULL;
 
-    double val = GetN(s);
+    node_val.value = GetN(s);
     if (**s == '.')
     {
         *s += 1;
         const char* s1 = *s;
         double val2 = GetN(s);
-        val += (double)(val2/pow(10,*s - s1));
+        node_val.value += (double)(val2/pow(10,*s - s1));
     }
     
-    node->data.value = val;
+    node = CreateNode(tree, IS_VAL, node_val);
 
     return node;
 }
