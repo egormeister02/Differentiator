@@ -127,7 +127,7 @@ node_type Simplifier(Tree* tree, Node* root)
     case Cos:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Acos)
-            root = root->left_child->left_child;
+            *root = *(root->left_child->left_child);
 
         else if (type_l_ch == IS_VAL)
         {
@@ -143,7 +143,7 @@ node_type Simplifier(Tree* tree, Node* root)
     case Sin:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Asin)
-            root = root->left_child->left_child;
+            *root = *(root->left_child->left_child);
 
         else if (type_l_ch == IS_VAL)
         {
@@ -159,7 +159,7 @@ node_type Simplifier(Tree* tree, Node* root)
     case Tan:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Atan)
-            root = root->left_child->left_child;
+            *root = *(root->left_child->left_child);
 
         else if (type_l_ch == IS_VAL)
         {
@@ -175,7 +175,7 @@ node_type Simplifier(Tree* tree, Node* root)
     case Acos:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Cos)
-            root = root->left_child->left_child;
+            *root = *(root->left_child->left_child);
 
         else if (type_l_ch == IS_VAL)
         {
@@ -191,7 +191,7 @@ node_type Simplifier(Tree* tree, Node* root)
     case Asin:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Sin)
-            root = root->left_child->left_child;
+            *root = *(root->left_child->left_child);
 
         else if (type_l_ch == IS_VAL)
         {
@@ -207,7 +207,7 @@ node_type Simplifier(Tree* tree, Node* root)
     case Atan:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Tan)
-            root = root->left_child->left_child;
+            *root = *(root->left_child->left_child);
 
         else if (type_l_ch == IS_VAL)
         {
@@ -241,7 +241,7 @@ node_type Simplifier(Tree* tree, Node* root)
 
     case Exp:
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Ln)
-            root = root->left_child->left_child;
+            *root = *(root->left_child->left_child);
 
         else if (type_l_ch == IS_VAL)
         {
@@ -257,7 +257,7 @@ node_type Simplifier(Tree* tree, Node* root)
     case Ln:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Exp)
-            root = root->left_child->left_child;
+            *root = *(root->left_child->left_child);
 
         else if (type_l_ch == IS_VAL)
         {
