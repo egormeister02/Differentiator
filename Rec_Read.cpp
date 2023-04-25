@@ -2,25 +2,27 @@
 
 int CreateText(TEXT* text, FILE* file) 
 {
-    ASSERT(text != NULL);
-    ASSERT(file != NULL);
+    ASSERT(text != nullptr);
+    ASSERT(file != nullptr);
 
     fseek(file, 0, SEEK_END);
     text->size = ftell(file);
     rewind(file);
 
     text->buf = (char*)calloc(text->size + 1, sizeof(char));
-    if (text->buf == NULL) return -1;
+    if (text->buf == nullptr) return -1;
 
     text->size = fread(text->buf,sizeof(char), text->size, file);
+
+    return 0;
 }
 
 void DtorText(TEXT* text)
 {
-    ASSERT(text != NULL);
+    ASSERT(text != nullptr);
 
     free(text->buf);
-    text->buf = NULL;
+    text->buf = nullptr;
     
 }
 
@@ -42,7 +44,7 @@ Node* GetE(const char** s, Tree* tree)
         *s += 1;
 
         node_data node_oper = {};
-        Node* node = NULL;
+        Node* node = nullptr;
 
         if (op == '+')
             node_oper.number = Add; 
@@ -68,7 +70,7 @@ Node* GetT(const char** s, Tree* tree)
         *s += 1;
 
         node_data node_oper = {};
-        Node* node = NULL;
+        Node* node = nullptr;
 
         if (op == '*')
             node_oper.number = Mul; 
@@ -93,7 +95,7 @@ Node* GetP(const char** s, Tree* tree)
         *s += 1;
 
         node_data node_oper = {};
-        Node* node = NULL;
+        Node* node = nullptr;
         node_oper.number = Pow; 
         node = CreateNode(tree, IS_FUNC, node_oper);
 
@@ -107,7 +109,7 @@ Node* GetP(const char** s, Tree* tree)
 
 Node* GetB(const char** s, Tree* tree)
 {
-    Node* node = NULL;
+    Node* node = nullptr;
     if (**s== '(')
     {
         *s += 1;
@@ -123,7 +125,7 @@ Node* GetB(const char** s, Tree* tree)
 
 Node* GetS(const char** s, Tree* tree)
 {
-    Node* node = NULL;
+    Node* node = nullptr;
     const char* sOld = *s;
     if ('0' <= **s && **s <= '9')
         node = GetF(s, tree);
@@ -156,7 +158,7 @@ Node* GetS(const char** s, Tree* tree)
         #include "def_cmd.h"
         #undef DEF_FUNC 
 
-        if (node == NULL)
+        if (node == nullptr)
             node = GetV(s, tree); 
 
         else if (**s == '(')
@@ -170,7 +172,7 @@ Node* GetS(const char** s, Tree* tree)
 Node* GetV(const char** s, Tree* tree)
 {
     node_data node_code = {};
-    Node* node = NULL;
+    Node* node = nullptr;
     node_code.number = (size_t)**s;
     node = CreateNode(tree, IS_VARIB, node_code);
     *s += 1;
@@ -180,7 +182,7 @@ Node* GetV(const char** s, Tree* tree)
 Node* GetLog(const char** s, Tree* tree)
 {
     node_data node_oper = {};
-    Node* node = NULL;
+    Node* node = nullptr;
     node_oper.number = Log;
     node = CreateNode(tree, IS_FUNC, node_oper);
 
@@ -203,7 +205,7 @@ Node* GetLog(const char** s, Tree* tree)
 Node* GetF(const char** s, Tree* tree)
 {
     node_data node_val = {};
-    Node* node = NULL;
+    Node* node = nullptr;
 
     node_val.value = GetN(s);
     if (**s == '.')

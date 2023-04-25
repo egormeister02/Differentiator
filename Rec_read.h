@@ -9,7 +9,7 @@ if (!(condition)){                                                \
     abort();}
 
 struct TEXT {
-    char* buf = NULL;
+    char* buf = nullptr;
     size_t size = 0;
 };
 

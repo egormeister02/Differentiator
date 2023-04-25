@@ -5,7 +5,7 @@ FILE* LogList = StartLog();
 
 void TreeDump(Tree* tree)
 {
-    if (tree == NULL) 
+    if (tree == nullptr) 
     {
         fputs("!!!__list == nullptr__!!!", LogList);
         return;
@@ -24,7 +24,7 @@ void TreeDump(Tree* tree)
     }
     fprintf(LogList, "-----------------------------------\n");
 
-    if (tree->root == NULL) 
+    if (tree->root == nullptr) 
     {
         fputs("!!!__list->buf == nullptr__!!!", LogList);
         return;

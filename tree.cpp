@@ -2,17 +2,17 @@
 
 Node* CreateNode(Tree* tree, node_type type, node_data data)
 {
-    if (tree == NULL) 
+    if (tree == nullptr) 
     {
-        printf("ERROR: Tree* == NULL in func 'CreateNode'\n");
-        return NULL;
+        printf("ERROR: Tree* == nullptr in func 'CreateNode'\n");
+        return nullptr;
     }
 
     Node* new_node = (Node*)calloc(1, sizeof(Node));
-    if (new_node == NULL)
+    if (new_node == nullptr)
     {
         tree->status |= ERR_TO_CALLOC_NODE;
-        return NULL;
+        return nullptr;
     }
 
     if (type == IS_VAL)
@@ -43,7 +43,7 @@ void PrintTree(FILE* OutFile, Tree* tree, PrintMode mode)
         print_preorder(OutFile, tree->root, func_str);
         break;
     
-    default:
+    case POST:
         print_postorder(OutFile, tree->root, func_str);
         break;
     }
@@ -124,26 +124,26 @@ void  tree_dtor(Tree* tree_ptr)
 {
     dtor_childs(tree_ptr->root);
 
-    tree_ptr->root = NULL;
+    tree_ptr->root = nullptr;
     tree_ptr->status |= TREE_OK;
 }
 
 void  dtor_childs(Node* node_ptr)
 {
-    if(node_ptr->left_child != NULL)
+    if(node_ptr->left_child != nullptr)
     {
         dtor_childs(node_ptr->left_child);
-        node_ptr->left_child = NULL;
+        node_ptr->left_child = nullptr;
     }
-    if(node_ptr->right_child != NULL)
+    if(node_ptr->right_child != nullptr)
     {
         dtor_childs(node_ptr->right_child);
-        node_ptr->right_child = NULL;
+        node_ptr->right_child = nullptr;
     }
 
     node_ptr->data.number = TREE_POISON;
 
     free(node_ptr);
-    node_ptr = NULL;
+    node_ptr = nullptr;
 }
 

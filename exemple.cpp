@@ -1,5 +1,4 @@
-#include "tree.h"
-#include "dump.h"
+#include "differ.h"
 #include "Rec_read.h"
 
 int main()
@@ -22,6 +21,11 @@ int main()
     tree.root->right_child = CreateNode(&tree, IS_VAL, val);
 */
     TreeDump(&tree);
+
+    Simplifier(&tree, tree.root);
+     
+    TreeDump(&tree);
+
     PrintTree(Out, &tree, IN);
     //TreeDump(&tree);
     //TreeDump(&tree);
