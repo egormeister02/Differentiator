@@ -4,4 +4,6 @@
 *.dot
 *.html
 *.out
+*.valgrind
+*.bash
 exemple

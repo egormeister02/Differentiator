@@ -7,7 +7,7 @@ void TreeDump(Tree* tree)
 {
     if (tree == nullptr) 
     {
-        fputs("!!!__list == nullptr__!!!", LogList);
+        fputs("!!!__tree == nullptr__!!!", LogList);
         return;
     }
 
@@ -15,7 +15,7 @@ void TreeDump(Tree* tree)
 
     fprintf(LogList, "-----------------------------------\n");
     if (tree->status == 0)
-        fprintf(LogList, "\t>>>List is OK\n");
+        fprintf(LogList, "\t>>>Tree is OK\n");
     else 
     {   
         StatPrint_(ERR_TO_CALLOC_NODE,                >>>Can not to allocate memory for node!!!!!);
@@ -26,7 +26,7 @@ void TreeDump(Tree* tree)
 
     if (tree->root == nullptr) 
     {
-        fputs("!!!__list->buf == nullptr__!!!", LogList);
+        fputs("!!!__tree->buf == nullptr__!!!", LogList);
         return;
     }
     else
@@ -131,7 +131,7 @@ size_t print_tree_links(Tree* tree, Node* node_ptr, FILE* DumpFile)
 FILE* StartLog(void)
 {
     char buff[30] = "";
-    sprintf(buff, "cd %s; rm *.svg", NAME_DOT_FOLDER);
+    sprintf(buff, "cd %s; rm -f *.svg", NAME_DOT_FOLDER);
     system(buff);
     
     FILE* logfile = fopen(NAME_LOG_FILE, "w");

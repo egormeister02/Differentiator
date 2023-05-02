@@ -127,7 +127,13 @@ node_type Simplifier(Tree* tree, Node* root)
     case Cos:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Acos)
+        {
+            Node* child1 = root->left_child;
+            Node* child2 = child1->left_child;
             *root = *(root->left_child->left_child);
+            free(child1);
+            free(child2);
+        }
 
         else if (type_l_ch == IS_VAL)
         {
@@ -143,7 +149,13 @@ node_type Simplifier(Tree* tree, Node* root)
     case Sin:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Asin)
+        {
+            Node* child1 = root->left_child;
+            Node* child2 = child1->left_child;
             *root = *(root->left_child->left_child);
+            free(child1);
+            free(child2);
+        }
 
         else if (type_l_ch == IS_VAL)
         {
@@ -159,7 +171,13 @@ node_type Simplifier(Tree* tree, Node* root)
     case Tan:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Atan)
+        {
+            Node* child1 = root->left_child;
+            Node* child2 = child1->left_child;
             *root = *(root->left_child->left_child);
+            free(child1);
+            free(child2);
+        }
 
         else if (type_l_ch == IS_VAL)
         {
@@ -175,7 +193,13 @@ node_type Simplifier(Tree* tree, Node* root)
     case Acos:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Cos)
+        {
+            Node* child1 = root->left_child;
+            Node* child2 = child1->left_child;
             *root = *(root->left_child->left_child);
+            free(child1);
+            free(child2);
+        }
 
         else if (type_l_ch == IS_VAL)
         {
@@ -191,11 +215,17 @@ node_type Simplifier(Tree* tree, Node* root)
     case Asin:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Sin)
+        {
+            Node* child1 = root->left_child;
+            Node* child2 = child1->left_child;
             *root = *(root->left_child->left_child);
+            free(child1);
+            free(child2);
+        }
 
         else if (type_l_ch == IS_VAL)
         {
-            root->type        = IS_VAL;
+            root->type        = IS_VAL; 
             root->data.value  = asin(root->left_child->data.value);
             root->left_child  = nullptr;
             root->right_child = nullptr;
@@ -207,7 +237,13 @@ node_type Simplifier(Tree* tree, Node* root)
     case Atan:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Tan)
+        {
+            Node* child1 = root->left_child;
+            Node* child2 = child1->left_child;
             *root = *(root->left_child->left_child);
+            free(child1);
+            free(child2);
+        }
 
         else if (type_l_ch == IS_VAL)
         {
@@ -241,7 +277,13 @@ node_type Simplifier(Tree* tree, Node* root)
 
     case Exp:
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Ln)
+        {
+            Node* child1 = root->left_child;
+            Node* child2 = child1->left_child;
             *root = *(root->left_child->left_child);
+            free(child1);
+            free(child2);
+        }
 
         else if (type_l_ch == IS_VAL)
         {
@@ -257,7 +299,13 @@ node_type Simplifier(Tree* tree, Node* root)
     case Ln:
 
         if (type_l_ch == IS_FUNC && root->left_child->data.number == Exp)
+        {
+            Node* child1 = root->left_child;
+            Node* child2 = child1->left_child;
             *root = *(root->left_child->left_child);
+            free(child1);
+            free(child2);
+        }
 
         else if (type_l_ch == IS_VAL)
         {
@@ -315,3 +363,9 @@ node_type Simplifier(Tree* tree, Node* root)
 
     return root->type;
 }
+/*
+int Diff_Tree(Node* root, Node* diff)
+{
+
+}
+*/
