@@ -24,9 +24,10 @@ int main()
 
     Simplifier(&tree, tree.root);
      
+
     TreeDump(&tree);
 
-    PrintTree(Out, &tree, IN);
+    //PrintTree(Out, &tree, IN);
     //TreeDump(&tree);
     //TreeDump(&tree);
 

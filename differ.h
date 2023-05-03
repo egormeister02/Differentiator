@@ -7,3 +7,6 @@ const double EPSILON = 0.000000001;
 
 node_type Simplifier(Tree*, Node*);
 
+int Diff_Tree(const Node*, Node*, Tree*);
+
+

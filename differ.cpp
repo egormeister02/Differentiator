@@ -11,8 +11,35 @@ node_type Simplifier(Tree* tree, Node* root)
     switch (root->data.number)
     {
     case Add:
+        if (type_l_ch == IS_FUNC && type_r_ch == IS_FUNC && root->left_child->data.number == Mul && root->right_child->data.number == Mul)
+        {
+            if (root->left_child->right_child->type == IS_VARIB && root->right_child->right_child->type == IS_VARIB)
+            {
+                if (root->left_child->right_child->data.number == root->right_child->right_child->data.number)
+                {
+                    Node* old_l_child = root->left_child;
+                    Node* old_r_child = root->right_child;
+                    root->data.number = Mul;
 
-        if (type_l_ch == IS_VAL && IS_ZERO(root->left_child->data.value)) root = root->right_child;
+                    root->right_child = CreateNode(tree, IS_VARIB, old_l_child->right_child->data);
+
+                    node_data oper {};
+                    oper.number = Add;
+                    root->left_child = CreateNode(tree, IS_FUNC, oper);
+
+                    root->left_child->left_child = old_l_child->left_child;
+                    root->left_child->right_child = old_r_child->left_child;
+
+                    free(old_l_child->right_child);
+                    free(old_r_child->right_child);
+                    free(old_l_child);
+                    free(old_r_child);   
+
+                    Simplifier(tree, root->left_child);                 
+                }
+            }
+        }
+        else if (type_l_ch == IS_VAL && IS_ZERO(root->left_child->data.value)) root = root->right_child;
         else if (type_r_ch == IS_VAL && IS_ZERO(root->right_child->data.value)) root = root->left_child;
 
         else if (type_l_ch == IS_VAL && type_r_ch == IS_VAL)
@@ -42,8 +69,53 @@ node_type Simplifier(Tree* tree, Node* root)
         break;
 
     case Mul:
+        if (type_r_ch == IS_VAL && type_l_ch != IS_VAL)
+        {
+            Node* l_child = root->left_child;
+            root->left_child = root->right_child;
+            root->right_child = l_child;
 
-        if ((type_l_ch == IS_VAL && IS_ZERO(root->left_child->data.value)) || (type_r_ch == IS_VAL && IS_ZERO(root->right_child->data.value)))
+            node_type temp_type = type_l_ch;
+            type_l_ch = type_r_ch;
+            type_r_ch = temp_type;
+        }
+
+        if (type_l_ch == IS_VARIB && type_r_ch == IS_FUNC)
+        {
+            Node* l_child = root->left_child;
+            root->left_child = root->right_child;
+            root->right_child = l_child;
+            
+            node_type temp_type = type_l_ch;
+            type_l_ch = type_r_ch;
+            type_r_ch = temp_type;
+        }
+
+        if (type_l_ch == IS_FUNC && root->left_child->data.number == Ln)
+        {
+            root->data.number = Ln;
+            root->left_child->data.number = Pow;
+            root->left_child->right_child = root->right_child;
+            root->right_child = nullptr;
+        }
+
+        else if (type_r_ch == IS_FUNC && root->right_child->data.number == Ln)
+        {
+            root->data.number = Ln;
+            Node* old_l_child = root->left_child;
+
+            node_data oper = {};
+            oper.number = Pow;
+            root->left_child = CreateNode(tree, IS_FUNC, oper);
+            
+            root->left_child->left_child = root->right_child->left_child;
+            root->left_child->right_child = old_l_child;
+
+            free(root->right_child);
+            root->right_child = nullptr;
+        }
+
+        else if ((type_l_ch == IS_VAL && IS_ZERO(root->left_child->data.value)) || (type_r_ch == IS_VAL && IS_ZERO(root->right_child->data.value)))
         {
             root->type = IS_VAL;
             root->data.value = 0;
@@ -363,9 +435,94 @@ node_type Simplifier(Tree* tree, Node* root)
 
     return root->type;
 }
-/*
-int Diff_Tree(Node* root, Node* diff)
-{
 
+int Diff_Tree(const Node* root, Node* diff_node, Tree* diff_tree)
+{
+    if (root->type == IS_VAL)
+    {
+        node_data data = {};
+        data.value = 0;
+        diff_node = CreateNode(diff_tree, IS_VAL, data);
+        return 0;
+    }
+
+    else if (root->type == IS_VARIB)
+    {
+        node_data data = {};
+        data.value = 1;
+        diff_node = CreateNode(diff_tree, IS_VAL, data);
+        return 0;
+    }
+
+    else
+    {
+        node_data oper = {};
+        switch (root->data.number)
+        {
+        case Add:            
+            oper.number = Add; 
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+            Diff_Tree(root->left_child, diff_node->left_child, diff_tree);
+            Diff_Tree(root->right_child, diff_node->right_child, diff_tree);
+            break;
+
+        case Sub:
+            oper.number = Sub; 
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+            Diff_Tree(root->left_child, diff_node->left_child, diff_tree);
+            Diff_Tree(root->right_child, diff_node->right_child, diff_tree);
+            break;
+
+        case Mul:
+            oper.number = Add;
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Mul;
+            diff_node->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+            diff_node->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            Diff_Tree(root->left_child, diff_node->left_child->left_child, diff_tree);
+            diff_node->left_child->right_child = Copy_Tree(diff_tree, root->right_child);
+
+            Diff_Tree(root->right_child, diff_node->right_child->left_child, diff_tree);
+            diff_node->right_child->right_child = Copy_Tree(diff_tree, root->left_child);
+
+            break;
+
+        case Div:
+            oper.number = Div;
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Sub;            
+            diff_node->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Mul;
+            diff_node->left_child->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+            diff_node->left_child->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            Diff_Tree(root->left_child, diff_node->left_child->left_child->left_child, diff_tree);
+            diff_node->left_child->left_child->right_child = Copy_Tree(diff_tree, root->right_child);
+
+            Diff_Tree(root->right_child, diff_node->left_child->right_child->left_child, diff_tree);
+            diff_node->left_child->right_child->right_child = Copy_Tree(diff_tree, root->left_child);
+
+            oper.number = Pow;
+            diff_node->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            diff_node->right_child->left_child = Copy_Tree(diff_tree, root->right_child);
+
+            oper.value = 2;
+            diff_node->right_child->right_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            break;
+
+        case Pow:
+
+            
+        default:
+            break;
+        }
+    }
+    
 }
-*/
+

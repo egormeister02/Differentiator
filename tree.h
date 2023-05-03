@@ -69,6 +69,8 @@ Node* CreateNode(Tree*, node_type, node_data);
 
 void PrintTree(FILE*, Tree*, PrintMode);
 
+Node* Copy_Tree(Tree*, Node*);
+
 void print_preorder(FILE*, Node*, char**);
 
 void print_inorder(FILE*, Node*, char**);

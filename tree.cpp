@@ -25,6 +25,23 @@ Node* CreateNode(Tree* tree, node_type type, node_data data)
     return new_node;
 }
 
+Node* Copy_Tree(Tree* tree, Node* root)
+{
+    if (root == nullptr)
+        return nullptr;
+
+    else if (root->type != IS_FUNC)
+        return CreateNode(tree, root->type, root->data);
+
+    else
+    {
+        Node* node = CreateNode(tree, root->type, root->data);
+        node->left_child = Copy_Tree(tree, root->left_child);
+        node->right_child = Copy_Tree(tree, root->right_child);
+        return node;
+    }
+}
+
 void PrintTree(FILE* OutFile, Tree* tree, PrintMode mode)
 {
     char* func_str[NUMBER_FUNC] = {};
