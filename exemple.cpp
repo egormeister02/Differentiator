@@ -24,14 +24,24 @@ int main()
 
     Simplifier(&tree, tree.root);
      
-
     TreeDump(&tree);
+
+    Tree diff_tree = {};
+
+    diff_tree.root = Diff_Tree(tree.root, &diff_tree);
+
+    TreeDump(&diff_tree);
+
+    Simplifier(&diff_tree, diff_tree.root);
+
+    TreeDump(&diff_tree);
 
     //PrintTree(Out, &tree, IN);
     //TreeDump(&tree);
     //TreeDump(&tree);
 
     tree_dtor(&tree);
+    tree_dtor(&diff_tree);
 
     return 0;
 }

@@ -25,7 +25,7 @@ Node* CreateNode(Tree* tree, node_type type, node_data data)
     return new_node;
 }
 
-Node* Copy_Tree(Tree* tree, Node* root)
+Node* Copy_Tree(Tree* tree, const Node* root)
 {
     if (root == nullptr)
         return nullptr;

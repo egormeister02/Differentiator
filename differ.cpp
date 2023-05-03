@@ -39,17 +39,32 @@ node_type Simplifier(Tree* tree, Node* root)
                 }
             }
         }
-        else if (type_l_ch == IS_VAL && IS_ZERO(root->left_child->data.value)) root = root->right_child;
-        else if (type_r_ch == IS_VAL && IS_ZERO(root->right_child->data.value)) root = root->left_child;
+        else if (type_l_ch == IS_VAL && IS_ZERO(root->left_child->data.value)) 
+        {           
+            Node* old_l_child = root->left_child;
+            Node* old_r_child = root->right_child;
+            *root = *root->right_child;
+            free(old_l_child);
+            free(old_r_child);
+        }
+        else if (type_r_ch == IS_VAL && IS_ZERO(root->right_child->data.value)) 
+        {           
+            Node* old_l_child = root->left_child;
+            Node* old_r_child = root->right_child;
+            *root = *root->left_child;
+            free(old_l_child);
+            free(old_r_child);
+        }
 
         else if (type_l_ch == IS_VAL && type_r_ch == IS_VAL)
         {
             root->type = IS_VAL;
             root->data.value = root->left_child->data.value + root->right_child->data.value;
+
             free(root->left_child);
-            free(root->right_child);root->left_child  = nullptr;
-            root->right_child = nullptr;
-             
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;            
         }
         break;
 
@@ -145,16 +160,18 @@ node_type Simplifier(Tree* tree, Node* root)
         else if ((type_l_ch == IS_VAL && IS_ZERO(root->left_child->data.value)) || (type_r_ch == IS_VAL && IS_ZERO(root->right_child->data.value)))
         {
             root->type = IS_VAL;
-            root->data.value = 0;  
-            free(root->left_child);
-            free(root->right_child);
+            root->data.value = 0; 
+
+            dtor_childs(root->left_child);
+            dtor_childs(root->right_child);
             root->left_child  = nullptr;
             root->right_child = nullptr;
         }
         else if (type_l_ch == IS_VAL && type_r_ch == IS_VAL)
         {
             root->type = IS_VAL;
-            root->data.value = root->left_child->data.value * root->right_child->data.value;           
+            root->data.value = root->left_child->data.value * root->right_child->data.value;
+
             free(root->left_child);
             free(root->right_child); 
             root->left_child  = nullptr;
@@ -476,41 +493,40 @@ node_type Simplifier(Tree* tree, Node* root)
     return root->type;
 }
 
-int Diff_Tree(const Node* root, Node* diff_node, Tree* diff_tree)
+Node* Diff_Tree(const Node* root, Tree* diff_tree)
 {
     if (root->type == IS_VAL)
     {
         node_data data = {};
         data.value = 0;
-        diff_node = CreateNode(diff_tree, IS_VAL, data);
-        return 0;
+        return CreateNode(diff_tree, IS_VAL, data);
     }
 
     else if (root->type == IS_VARIB)
     {
         node_data data = {};
         data.value = 1;
-        diff_node = CreateNode(diff_tree, IS_VAL, data);
-        return 0;
+        return CreateNode(diff_tree, IS_VAL, data);
     }
 
     else
     {
+        Node* diff_node = nullptr;
         node_data oper = {};
         switch (root->data.number)
         {
         case Add:            
             oper.number = Add; 
             diff_node = CreateNode(diff_tree, IS_FUNC, oper);
-            Diff_Tree(root->left_child, diff_node->left_child, diff_tree);
-            Diff_Tree(root->right_child, diff_node->right_child, diff_tree);
+            diff_node->left_child = Diff_Tree(root->left_child, diff_tree);
+             diff_node->right_child = Diff_Tree(root->right_child, diff_tree);
             break;
 
         case Sub:
             oper.number = Sub; 
             diff_node = CreateNode(diff_tree, IS_FUNC, oper);
-            Diff_Tree(root->left_child, diff_node->left_child, diff_tree);
-            Diff_Tree(root->right_child, diff_node->right_child, diff_tree);
+            diff_node->left_child = Diff_Tree(root->left_child, diff_tree);
+             diff_node->right_child = Diff_Tree(root->right_child, diff_tree);
             break;
 
         case Mul:
@@ -521,10 +537,10 @@ int Diff_Tree(const Node* root, Node* diff_node, Tree* diff_tree)
             diff_node->left_child = CreateNode(diff_tree, IS_FUNC, oper);
             diff_node->right_child = CreateNode(diff_tree, IS_FUNC, oper);
 
-            Diff_Tree(root->left_child, diff_node->left_child->left_child, diff_tree);
+            diff_node->left_child->left_child = Diff_Tree(root->left_child, diff_tree);
             diff_node->left_child->right_child = Copy_Tree(diff_tree, root->right_child);
 
-            Diff_Tree(root->right_child, diff_node->right_child->left_child, diff_tree);
+            diff_node->right_child->left_child = Diff_Tree(root->right_child, diff_tree);
             diff_node->right_child->right_child = Copy_Tree(diff_tree, root->left_child);
 
             break;
@@ -540,10 +556,10 @@ int Diff_Tree(const Node* root, Node* diff_node, Tree* diff_tree)
             diff_node->left_child->left_child = CreateNode(diff_tree, IS_FUNC, oper);
             diff_node->left_child->right_child = CreateNode(diff_tree, IS_FUNC, oper);
 
-            Diff_Tree(root->left_child, diff_node->left_child->left_child->left_child, diff_tree);
+            diff_node->left_child->left_child->left_child = Diff_Tree(root->left_child, diff_tree);
             diff_node->left_child->left_child->right_child = Copy_Tree(diff_tree, root->right_child);
 
-            Diff_Tree(root->right_child, diff_node->left_child->right_child->left_child, diff_tree);
+            diff_node->left_child->right_child->left_child = Diff_Tree(root->right_child, diff_tree);
             diff_node->left_child->right_child->right_child = Copy_Tree(diff_tree, root->left_child);
 
             oper.number = Pow;
@@ -558,11 +574,240 @@ int Diff_Tree(const Node* root, Node* diff_node, Tree* diff_tree)
 
         case Pow:
 
-            
-        default:
+            diff_node = Diff_Tree(Make_tree_for_pow(root), diff_tree);
+
+            break;
+
+        case Cos:
+            oper.number = Mul;
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+
+            diff_node->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = -1;
+            diff_node->left_child->left_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            oper.number = Sin;
+            diff_node->left_child->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            diff_node->left_child->right_child->left_child = Copy_Tree(diff_tree, root->left_child);
+
+            diff_node->right_child = Diff_Tree(root->left_child, diff_tree);
+
+            break;
+
+        case Sin:
+            oper.number = Mul;
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Cos;
+            diff_node->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            diff_node->left_child->left_child = Copy_Tree(diff_tree, root->left_child);
+
+            diff_node->right_child = Diff_Tree(root->left_child, diff_tree);
+
+            break;  
+
+        case Tan:
+            oper.number = Mul;
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Div;
+            diff_node->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 1;
+            diff_node->left_child->left_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            oper.number = Pow;
+            diff_node->left_child->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Cos;
+            diff_node->left_child->right_child->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            diff_node->left_child->right_child->left_child->left_child = Copy_Tree(diff_tree, root->left_child);
+
+            oper.value = 2;
+            diff_node->left_child->right_child->right_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            diff_node->right_child = Diff_Tree(root->left_child, diff_tree);
+
+            break;
+
+        case Asin:
+            oper.number = Mul;
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Div;
+            diff_node->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 1;
+            diff_node->left_child->left_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            oper.number = Sqrt;
+            diff_node->left_child->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Sub;
+            diff_node->left_child->right_child->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 1;
+            diff_node->left_child->right_child->left_child->left_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            oper.number = Pow;
+            diff_node->left_child->right_child->left_child->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 2;
+            diff_node->left_child->right_child->left_child->right_child->right_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            diff_node->left_child->right_child->left_child->right_child->left_child = Copy_Tree(diff_tree, root->left_child);
+
+            diff_node->right_child = Diff_Tree(root->left_child, diff_tree);
+
+            break;
+
+        case Acos:
+            oper.number = Mul;
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Div;
+            diff_node->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 1;
+            diff_node->left_child->left_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            oper.number = Sqrt;
+            diff_node->left_child->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Sub;
+            diff_node->left_child->right_child->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 1;
+            diff_node->left_child->right_child->left_child->left_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            oper.number = Pow;
+            diff_node->left_child->right_child->left_child->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 2;
+            diff_node->left_child->right_child->left_child->right_child->right_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            diff_node->left_child->right_child->left_child->right_child->left_child = Copy_Tree(diff_tree, root->left_child);
+
+            oper.number = Mul;
+            diff_node->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = -1;
+            diff_node->right_child->left_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            diff_node->right_child->left_child = Diff_Tree(root->left_child, diff_tree);
+
+            break;
+
+        case Atan:
+            oper.number = Mul;
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Div;
+            diff_node->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 1;
+            diff_node->left_child->left_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            oper.number = Sub;
+            diff_node->left_child->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 1;
+            diff_node->left_child->right_child->left_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            oper.number = Pow;
+            diff_node->left_child->right_child->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 2;
+            diff_node->left_child->right_child->right_child->right_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            diff_node->left_child->right_child->right_child->left_child = Copy_Tree(diff_tree, root->left_child);
+
+            diff_node->right_child = Diff_Tree(root->left_child, diff_tree);
+
+            break;
+
+        case Sqrt:
+            oper.number = Mul;
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Div;
+            diff_node->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 1;
+            diff_node->left_child->left_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            oper.number = Mul;
+            diff_node->left_child->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 2;
+            diff_node->left_child->right_child->left_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            oper.number = Sqrt;
+            diff_node->left_child->right_child->right_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            diff_node->left_child->right_child->right_child->left_child = Copy_Tree(diff_tree, root->left_child);
+
+            diff_node->right_child = Diff_Tree(root->left_child, diff_tree);
+
+            break;
+
+        case Exp:
+            oper.number = Mul;
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Exp;
+            diff_node->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            diff_node->left_child->left_child = Copy_Tree(diff_tree, root->left_child);
+
+            diff_node->right_child = Diff_Tree(root->left_child, diff_tree);
+
+            break;
+
+        case Ln:
+            oper.number = Mul;
+            diff_node = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.number = Div;
+            diff_node->left_child = CreateNode(diff_tree, IS_FUNC, oper);
+
+            oper.value = 1;
+            diff_node->left_child->left_child = CreateNode(diff_tree, IS_VAL, oper);
+
+            diff_node->left_child->right_child = Copy_Tree(diff_tree, root->left_child);
+
+            diff_node->right_child = Diff_Tree(root->left_child, diff_tree);
+
             break;
         }
+        return diff_node;
     }
+}
+
+Node* Make_tree_for_pow(const Node* root)
+{
+    Tree temp_tree = {};
+    node_data oper = {};
+
+    oper.number = Exp;
+    temp_tree.root = CreateNode(&temp_tree, IS_FUNC, oper);
+    Node* temp_node = temp_tree.root;
     
+    oper.number = Mul;
+    temp_node->left_child = CreateNode(&temp_tree, IS_FUNC, oper);
+
+    temp_node->left_child->left_child = Copy_Tree(&temp_tree, root->right_child);
+
+    oper.number = Ln;
+    temp_node->left_child->right_child = CreateNode(&temp_tree, IS_FUNC, oper);
+
+    temp_node->left_child->right_child->left_child = Copy_Tree(&temp_tree, root->left_child);
+
+    return temp_node;
+
 }
 

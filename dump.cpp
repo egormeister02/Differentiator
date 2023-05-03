@@ -26,7 +26,7 @@ void TreeDump(Tree* tree)
 
     if (tree->root == nullptr) 
     {
-        fputs("!!!__tree->buf == nullptr__!!!", LogList);
+        fputs("!!!__tree->root == nullptr__!!!", LogList);
         return;
     }
     else

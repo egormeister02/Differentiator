@@ -69,7 +69,7 @@ Node* CreateNode(Tree*, node_type, node_data);
 
 void PrintTree(FILE*, Tree*, PrintMode);
 
-Node* Copy_Tree(Tree*, Node*);
+Node* Copy_Tree(Tree*, const Node*);
 
 void print_preorder(FILE*, Node*, char**);
 
