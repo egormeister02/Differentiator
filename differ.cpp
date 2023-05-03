@@ -167,6 +167,25 @@ node_type Simplifier(Tree* tree, Node* root)
             root->left_child  = nullptr;
             root->right_child = nullptr;
         }
+
+        else if (type_l_ch == IS_VAL && IS_ONE(root->left_child->data.value))
+        {
+            Node* old_l_child = root->left_child;
+            Node* old_r_child = root->right_child;
+            *root = *root->right_child;
+            free(old_l_child);
+            free(old_r_child);
+        }
+
+        else if (type_r_ch == IS_VAL && IS_ONE(root->right_child->data.value))
+        {
+            Node* old_l_child = root->left_child;
+            Node* old_r_child = root->right_child;
+            *root = *root->left_child;
+            free(old_l_child);
+            free(old_r_child);
+        }
+        
         else if (type_l_ch == IS_VAL && type_r_ch == IS_VAL)
         {
             root->type = IS_VAL;
