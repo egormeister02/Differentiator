@@ -46,25 +46,52 @@ node_type Simplifier(Tree* tree, Node* root)
         {
             root->type = IS_VAL;
             root->data.value = root->left_child->data.value + root->right_child->data.value;
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);root->left_child  = nullptr;
+            root->right_child = nullptr;
+             
         }
         break;
 
     case Sub:
+        if (type_l_ch == IS_FUNC && type_r_ch == IS_FUNC && root->left_child->data.number == Mul && root->right_child->data.number == Mul)
+        {
+            if (root->left_child->right_child->type == IS_VARIB && root->right_child->right_child->type == IS_VARIB)
+            {
+                if (root->left_child->right_child->data.number == root->right_child->right_child->data.number)
+                {
+                    Node* old_l_child = root->left_child;
+                    Node* old_r_child = root->right_child;
+                    root->data.number = Mul;
 
-        if (type_r_ch == IS_VAL && IS_ZERO(root->right_child->data.value)) root = root->left_child;
+                    root->right_child = CreateNode(tree, IS_VARIB, old_l_child->right_child->data);
+
+                    node_data oper {};
+                    oper.number = Sub;
+                    root->left_child = CreateNode(tree, IS_FUNC, oper);
+
+                    root->left_child->left_child = old_l_child->left_child;
+                    root->left_child->right_child = old_r_child->left_child;
+
+                    free(old_l_child->right_child);
+                    free(old_r_child->right_child);
+                    free(old_l_child);
+                    free(old_r_child);   
+
+                    Simplifier(tree, root->left_child);                 
+                }
+            }
+        }
+        else if (type_r_ch == IS_VAL && IS_ZERO(root->right_child->data.value)) root = root->left_child;
 
         else if (type_l_ch == IS_VAL && type_r_ch == IS_VAL)
         {
             root->type = IS_VAL;
             root->data.value = root->left_child->data.value - root->right_child->data.value;
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);root->left_child  = nullptr;
+            root->right_child = nullptr;
+             
         }
         break;
 
@@ -85,7 +112,7 @@ node_type Simplifier(Tree* tree, Node* root)
             Node* l_child = root->left_child;
             root->left_child = root->right_child;
             root->right_child = l_child;
-            
+
             node_type temp_type = type_l_ch;
             type_l_ch = type_r_ch;
             type_r_ch = temp_type;
@@ -118,20 +145,20 @@ node_type Simplifier(Tree* tree, Node* root)
         else if ((type_l_ch == IS_VAL && IS_ZERO(root->left_child->data.value)) || (type_r_ch == IS_VAL && IS_ZERO(root->right_child->data.value)))
         {
             root->type = IS_VAL;
-            root->data.value = 0;
+            root->data.value = 0;  
+            free(root->left_child);
+            free(root->right_child);
             root->left_child  = nullptr;
             root->right_child = nullptr;
-            free(root->left_child);
-            free(root->right_child); 
         }
         else if (type_l_ch == IS_VAL && type_r_ch == IS_VAL)
         {
             root->type = IS_VAL;
-            root->data.value = root->left_child->data.value * root->right_child->data.value;
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+            root->data.value = root->left_child->data.value * root->right_child->data.value;           
             free(root->left_child);
             free(root->right_child); 
+            root->left_child  = nullptr;
+            root->right_child = nullptr;
         }
         break;
 
@@ -146,19 +173,20 @@ node_type Simplifier(Tree* tree, Node* root)
         {
             root->type = IS_VAL;
             root->data.value = 0;
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);root->left_child  = nullptr;
+            root->right_child = nullptr;
+             
         }
         else if (type_l_ch == IS_VAL && type_r_ch == IS_VAL)
         {
             root->type        = IS_VAL;
             root->data.value  = root->left_child->data.value / root->right_child->data.value;
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+
             free(root->left_child);
-            free(root->right_child);  
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;             
         }
 
         break;
@@ -168,31 +196,34 @@ node_type Simplifier(Tree* tree, Node* root)
         if (type_r_ch == IS_VAL && IS_ZERO(root->right_child->data.value)) 
         {
             root->type        =  IS_VAL;
-            root->data.value  =       1;            
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+            root->data.value  =       1;   
+
             free(root->left_child);
-            free(root->right_child);  
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;              
         }
 
         else if (type_l_ch == IS_VAL && IS_ZERO(root->left_child->data.value)) 
         {
             root->type        = IS_VAL;
             root->data.value  = 0;
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;             
         }
 
         else if (type_l_ch == IS_VAL && type_r_ch == IS_VAL)
         {
             root->type = IS_VAL;
             root->data.value = pow(root->left_child->data.value, root->right_child->data.value);
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;             
         }
         break;
 
@@ -211,10 +242,11 @@ node_type Simplifier(Tree* tree, Node* root)
         {
             root->type        = IS_VAL;
             root->data.value  = cos(root->left_child->data.value);
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;             
         }
         break;
 
@@ -233,10 +265,11 @@ node_type Simplifier(Tree* tree, Node* root)
         {
             root->type        = IS_VAL;
             root->data.value  = sin(root->left_child->data.value);
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;             
         }
         break; 
 
@@ -255,10 +288,11 @@ node_type Simplifier(Tree* tree, Node* root)
         {
             root->type        = IS_VAL;
             root->data.value  = tan(root->left_child->data.value);
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;             
         }
         break;
 
@@ -277,10 +311,11 @@ node_type Simplifier(Tree* tree, Node* root)
         {
             root->type        = IS_VAL;
             root->data.value  = acos(root->left_child->data.value);
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;             
         }
         break;
 
@@ -299,10 +334,11 @@ node_type Simplifier(Tree* tree, Node* root)
         {
             root->type        = IS_VAL; 
             root->data.value  = asin(root->left_child->data.value);
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;             
         }
         break;
 
@@ -321,10 +357,11 @@ node_type Simplifier(Tree* tree, Node* root)
         {
             root->type        = IS_VAL;
             root->data.value  = atan(root->left_child->data.value);
+
+            free(root->left_child);
+            free(root->right_child);
             root->left_child  = nullptr;
             root->right_child = nullptr;
-            free(root->left_child);
-            free(root->right_child); 
         }
         break;
 
@@ -361,10 +398,11 @@ node_type Simplifier(Tree* tree, Node* root)
         {
             root->type        = IS_VAL;
             root->data.value  = exp(root->left_child->data.value);
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;             
         }
         break;
 
@@ -388,10 +426,11 @@ node_type Simplifier(Tree* tree, Node* root)
             }
             root->type        = IS_VAL;
             root->data.value  = log(root->left_child->data.value);
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;             
         }
         break;
 
@@ -406,10 +445,11 @@ node_type Simplifier(Tree* tree, Node* root)
             }
             root->type        = IS_VAL;
             root->data.value  = log10(root->left_child->data.value);
-            root->left_child  = nullptr;
-            root->right_child = nullptr;
+
             free(root->left_child);
-            free(root->right_child); 
+            free(root->right_child);
+            root->left_child  = nullptr;
+            root->right_child = nullptr;             
         }
         break;
 
