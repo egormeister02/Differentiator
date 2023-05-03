@@ -133,31 +133,7 @@ node_type Simplifier(Tree* tree, Node* root)
             type_r_ch = temp_type;
         }
 
-        if (type_l_ch == IS_FUNC && root->left_child->data.number == Ln)
-        {
-            root->data.number = Ln;
-            root->left_child->data.number = Pow;
-            root->left_child->right_child = root->right_child;
-            root->right_child = nullptr;
-        }
-
-        else if (type_r_ch == IS_FUNC && root->right_child->data.number == Ln)
-        {
-            root->data.number = Ln;
-            Node* old_l_child = root->left_child;
-
-            node_data oper = {};
-            oper.number = Pow;
-            root->left_child = CreateNode(tree, IS_FUNC, oper);
-            
-            root->left_child->left_child = root->right_child->left_child;
-            root->left_child->right_child = old_l_child;
-
-            free(root->right_child);
-            root->right_child = nullptr;
-        }
-
-        else if ((type_l_ch == IS_VAL && IS_ZERO(root->left_child->data.value)) || (type_r_ch == IS_VAL && IS_ZERO(root->right_child->data.value)))
+        if ((type_l_ch == IS_VAL && IS_ZERO(root->left_child->data.value)) || (type_r_ch == IS_VAL && IS_ZERO(root->right_child->data.value)))
         {
             root->type = IS_VAL;
             root->data.value = 0; 
@@ -196,6 +172,31 @@ node_type Simplifier(Tree* tree, Node* root)
             root->left_child  = nullptr;
             root->right_child = nullptr;
         }
+        else if (type_l_ch == IS_FUNC && root->left_child->data.number == Ln)
+        {
+            root->data.number = Ln;
+            root->left_child->data.number = Pow;
+            root->left_child->right_child = root->right_child;
+            root->right_child = nullptr;
+        }
+
+        else if (type_r_ch == IS_FUNC && root->right_child->data.number == Ln)
+        {
+            root->data.number = Ln;
+            Node* old_l_child = root->left_child;
+
+            node_data oper = {};
+            oper.number = Pow;
+            root->left_child = CreateNode(tree, IS_FUNC, oper);
+            
+            root->left_child->left_child = root->right_child->left_child;
+            root->left_child->right_child = old_l_child;
+
+            free(root->right_child);
+            root->right_child = nullptr;
+        }
+
+        
         break;
 
     case Div:
@@ -249,6 +250,15 @@ node_type Simplifier(Tree* tree, Node* root)
             free(root->right_child);
             root->left_child  = nullptr;
             root->right_child = nullptr;             
+        }
+
+        else if (type_r_ch == IS_VAL && IS_ONE(root->right_child->data.value))
+        {
+            Node* old_l_child = root->left_child;
+            Node* old_r_child = root->right_child;
+            *root = *root->left_child;
+            free(old_l_child);
+            free(old_r_child);
         }
 
         else if (type_l_ch == IS_VAL && type_r_ch == IS_VAL)
@@ -532,6 +542,7 @@ Node* Diff_Tree(const Node* root, Tree* diff_tree)
     {
         Node* diff_node = nullptr;
         node_data oper = {};
+        Node* tree_for_pow = nullptr;
         switch (root->data.number)
         {
         case Add:            
@@ -592,8 +603,9 @@ Node* Diff_Tree(const Node* root, Tree* diff_tree)
             break;
 
         case Pow:
-
-            diff_node = Diff_Tree(Make_tree_for_pow(root), diff_tree);
+            tree_for_pow = Make_tree_for_pow(root);
+            diff_node = Diff_Tree(tree_for_pow, diff_tree);
+            dtor_childs(tree_for_pow);
 
             break;
 
