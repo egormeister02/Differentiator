@@ -1,4 +1,4 @@
-mkdir -p build bin logs dot_files
+mkdir -p build logs dot_files
 cd build
 cmake ..
 make

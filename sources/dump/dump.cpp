@@ -56,7 +56,7 @@ void TreeDump(Tree* tree)
     sprintf(buff, "dot -Tsvg -o %s dump.dot", dumpName);
     system(buff);
 
-    fprintf(LogList, "<img src = %s>\n", dumpName);
+    fprintf(LogList, "<img src = ../%s>\n", dumpName);
     pngIndex++;
 }
 
