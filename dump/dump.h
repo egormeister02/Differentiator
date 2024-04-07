@@ -1,5 +1,7 @@
 #ifndef DUMP
 #define DUMP
+
+#include "tree.h"
 #include "colors.h"
 
 #define StatPrint_(STATUS,text)                 \
@@ -8,8 +10,8 @@
         fprintf(LogList, "\t"#text "\n");       \
     }
 
-const char    NAME_LOG_FILE[]   =     "TreeLog.html";
-const char    NAME_DOT_FOLDER[] =        "dot_files";
+const char    NAME_LOG_FILE[]   =     "../logs/TreeLog.html";
+const char    NAME_DOT_FOLDER[] =        "../dot_files";
 
 
 void TreeDump(Tree*);      

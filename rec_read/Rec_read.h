@@ -1,4 +1,5 @@
 #include "tree.h"
+
 #define ASSERT(condition)                                         \
 if (!(condition)){                                                \
     fprintf(stdout, "Error in %s:\n"                              \

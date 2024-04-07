@@ -5,5 +5,7 @@
 *.html
 *.out
 *.valgrind
-*.bash
-exemple
+bin/
+logs/
+build/
+dot_files/
