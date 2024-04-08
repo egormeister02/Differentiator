@@ -2,7 +2,7 @@
 
 FILE* LogList = StartLog();
 
-void TreeDump(Tree* tree)
+void TreeDump(Tree* tree, const char* message)
 {
     if (tree == nullptr) 
     {
@@ -13,6 +13,12 @@ void TreeDump(Tree* tree)
     fprintf(LogList, "\n<pre>\n----------------------------------TreeDump----------------------------------\n\n");
 
     fprintf(LogList, "-----------------------------------\n");
+    if (message != nullptr)
+    {
+        fputs(message, LogList);
+        fputs("\n", LogList);
+    }    
+    
     if (tree->status == 0)
         fprintf(LogList, "\t>>>Tree is OK\n");
     else 

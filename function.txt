@@ -1,1 +1,1 @@
-5*x+3*x-sin(exp(x))
+3*x+4*x-sin(ln(x))

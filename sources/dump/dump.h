@@ -14,7 +14,7 @@ const char    NAME_LOG_FILE[]   =     "logs/TreeLog.html";
 const char    NAME_DOT_FOLDER[] =        "dot_files";
 
 
-void TreeDump(Tree*);      
+void TreeDump(Tree*, const char* message = nullptr);      
 
 size_t print_tree_data(Tree* tree, Node* node_ptr, FILE* DumpFile);
 
